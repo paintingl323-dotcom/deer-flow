@@ -14,9 +14,9 @@ ENV PATH="/root/.local/bin:$PATH"
 # Set working directory
 WORKDIR /app
 
-# Copy configuration and skills from root
+# Copy configuration and skills from root (skills is optional)
 COPY config.yaml .
-COPY skills ./skills
+COPY skills* ./skills/
 
 # Copy backend source code
 COPY backend ./backend
