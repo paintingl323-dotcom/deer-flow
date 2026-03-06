@@ -14,10 +14,6 @@ ENV PATH="/root/.local/bin:$PATH"
 # Set working directory
 WORKDIR /app
 
-# Copy configuration and skills from root (skills is optional)
-COPY config.yaml .
-COPY skills* ./skills/
-
 # Copy backend source code
 COPY backend ./backend
 
@@ -31,5 +27,5 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Expose ports (gateway: 8001, langgraph: 2024)
 EXPOSE 8001 2024
 
-# Default command
-CMD ["uv", "run", "uvicorn", "src.gateway.app:app", "--host", "0.0.0.0", "--port", "8001"]
+# Default command - generate config.yaml from env vars then start server
+CMD ["sh", "-c", "cat > /app/config.yaml << 'YAML'\nmodels:\n  - name: gemini-2.5-pro\n    display_name: Gemini 2.5 Pro\n    use: langchain_google_genai:ChatGoogleGenerativeAI\n    model: gemini-2.5-pro\n    google_api_key: GEMINI_KEY_PLACEHOLDER\n    max_tokens: 8192\n    supports_vision: true\ntool_groups:\n  - name: web\n  - name: file:read\n  - name: file:write\n  - name: bash\ntools:\n  - name: web_fetch\n    group: web\n    use: src.community.jina_ai.tools:web_fetch_tool\n    timeout: 10\nsandbox:\n  use: src.sandbox.local:LocalSandboxProvider\nYAML\nsed -i \"s|GEMINI_KEY_PLACEHOLDER|${GEMINI_API_KEY}|g\" /app/config.yaml && uv run uvicorn src.gateway.app:app --host 0.0.0.0 --port 8001"]
