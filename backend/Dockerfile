@@ -11,11 +11,18 @@ RUN apt-get update && apt-get install -y \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# Set working directory to the backend folder
-WORKDIR /app/backend
+# Set working directory
+WORKDIR /app
 
-# Copy backend source code directly into the current workdir
-COPY backend .
+# Copy configuration and skills from root
+COPY config.yaml .
+COPY skills ./skills
+
+# Copy backend source code
+COPY backend ./backend
+
+# Set working directory to backend for execution
+WORKDIR /app/backend
 
 # Install dependencies with cache mount
 RUN --mount=type=cache,target=/root/.cache/uv \
