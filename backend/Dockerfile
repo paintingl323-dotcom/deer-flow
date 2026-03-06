@@ -1,4 +1,4 @@
-# Backend Dockerfile
+# Backend Dockerfile for Render deployment
 FROM python:3.12-slim
 
 # Install system dependencies
@@ -24,12 +24,12 @@ RUN chmod +x ./entrypoint.sh
 # Set working directory to backend
 WORKDIR /app/backend
 
-# Install dependencies with cache mount
+# Install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-# Expose ports
-EXPOSE 8001 2024
+# Expose port
+EXPOSE 10000
 
 # Use entrypoint script
 CMD ["/app/entrypoint.sh"]

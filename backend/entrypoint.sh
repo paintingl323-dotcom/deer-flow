@@ -25,18 +25,18 @@ sandbox:
   use: src.sandbox.local:LocalSandboxProvider
 YAML
 
-echo "Config generated, starting services..."
+echo "Config generated at /app/config.yaml"
 
-# Start LangGraph server in background on port 2024
-LANGCHAIN_TRACING_V2=false uv run langgraph up \
+# Set the DEER_FLOW_CONFIG_PATH so langgraph server can find the config
+export DEER_FLOW_CONFIG_PATH=/app/config.yaml
+
+# Also disable LangSmith tracing to avoid auth errors
+export LANGCHAIN_TRACING_V2=false
+
+echo "Starting LangGraph server on port ${PORT:-2024}..."
+
+# Start LangGraph Dev Server - this handles /runs/stream
+exec uv run langgraph dev \
   --host 0.0.0.0 \
-  --port 2024 \
-  --no-browser &
-
-LANGGRAPH_PID=$!
-
-# Wait a moment for langgraph to start
-sleep 5
-
-# Start API gateway in foreground on the main port
-exec uv run uvicorn src.gateway.app:app --host 0.0.0.0 --port ${PORT:-8001}
+  --port ${PORT:-2024} \
+  --no-browser
