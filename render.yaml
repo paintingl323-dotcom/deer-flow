@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: deerflow-backend
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: backend/Dockerfile
+    plan: free # 可根據需求升級
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: PORT
+        value: 8001
